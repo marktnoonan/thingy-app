@@ -1,15 +1,24 @@
 <template>
   <div class="avocado-info">
-    <h1>Fresh Avocado</h1>
-    <p>This is an avocado website. It comes with an avocado diagram.</p>
-    <button @click="noJs = !noJs">"Toggle JS"</button>
+    <button
+      @click="noJs = !noJs"
+      style="position: fixed; left: 30px; top: 10px"
+    >
+      "Toggle JS"
+    </button>
     <!-- NO-JS example -->
     <article v-if="diagramData && noJs">
       <h2>{{ diagramData.title }}</h2>
       <p>{{ diagramData.subtitle }}</p>
-      <section v-for="layer in diagramData.layers" :key="layer.name">
+      <section
+        v-for="layer in diagramData.layers"
+        :key="layer.name"
+        style="border-bottom: 1px solid #eee; margin-bottom: 12px"
+      >
         <header>
-          <div class="swatch" :style="{ backgroundColor: layer.color }"></div>
+          <div class="swatch" :style="{ backgroundColor: layer.color }">
+            <img width="76" :src="require(`@/assets/${layer.image}`)" alt="" />
+          </div>
           <h3>{{ layer.name }}</h3>
         </header>
         <ul>
@@ -29,7 +38,8 @@
       <tabs v-model="activeTab" class="tab-container" :key="tabWrapperKey">
         <tab-list class="tabs-list" :label="diagramData.title">
           <tab v-for="layer in diagramData.layers" :key="layer.name">
-            ⬤ <span class="sr-only">{{ layer.name }}</span>
+            ⬤
+            <span class="sr-only">{{ layer.name }}</span>
           </tab>
         </tab-list>
         <tab-panel
@@ -46,8 +56,10 @@
               alt=""
               width="400"
             />
-            <transition name="fade-slow">
+            <transition name="fade-slow" mode="out-in">
               <div class="popover-layer" v-if="activeTab === index">
+                {{ activeTab === index }}
+                {{ activeTab }} {{ index }}
                 <Popover v-for="point in layer.points" :key="point.name">
                   <PopoverButton
                     class="popover-activator"
@@ -85,6 +97,7 @@
                   </transition>
                 </Popover>
               </div>
+              <div v-else>Loading</div>
             </transition>
           </div>
         </tab-panel>
@@ -115,11 +128,9 @@ watch(scrollY, (val) => {
       activeTab.value = 2;
       tabWrapperKey.value = !tabWrapperKey.value;
     }
-  } else {
-    if (activeTab.value != 0) {
-      activeTab.value = 0;
-      tabWrapperKey.value = !tabWrapperKey.value;
-    }
+  } else if (activeTab.value != 0) {
+    activeTab.value = 0;
+    tabWrapperKey.value = !tabWrapperKey.value;
   }
 });
 </script>
@@ -135,6 +146,9 @@ watch(scrollY, (val) => {
   height: 60px;
   width: 60px;
   border-radius: 50px;
+  display: grid;
+  align-content: center;
+  overflow: hidden;
 }
 
 .image-container {
@@ -144,6 +158,8 @@ watch(scrollY, (val) => {
 
 .image-container > img {
   border-radius: 50px/40px;
+  border: 3px solid;
+  box-shadow: 0 0 0 2px;
 }
 
 .popover-layer {
@@ -168,7 +184,7 @@ watch(scrollY, (val) => {
   background: rgba(255, 255, 255, 0.8);
   border: 1px solid #ddd;
   border-radius: 0 8px 8px 8px;
-  padding: 16px;
+  padding: 12px;
   width: 300px;
   text-align: left;
   z-index: 800;
@@ -209,6 +225,7 @@ ul {
   list-style-type: none;
   padding-left: 0;
   text-align: left;
+  margin: 0;
 }
 
 li {
@@ -218,6 +235,15 @@ li {
 a {
   color: #42b983;
   text-decoration: none;
+}
+
+section header {
+  display: flex;
+  align-items: center;
+}
+
+section header > * {
+  margin-right: 12px;
 }
 
 .fade-enter-active,
@@ -233,7 +259,7 @@ a {
 
 .fade-slow-enter-active,
 .fade-slow-leave-active {
-  transition: opacity 0.6s ease 1s;
+  transition: opacity 0.6s linear 1s;
 }
 
 .fade-slow-enter-from,

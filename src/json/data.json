@@ -3,16 +3,16 @@
   "subtitle": "The ticking time-fruit",
   "layers": [
     {
-      "name": "Outer Shell",
+      "name": "Outer shell",
       "color": "#233822",
       "image": "shell.png",
       "points": [
         {
           "heading": "Exocarp",
-          "description": "The thing about exocarps is...",
+          "description": "The skin of the avocado is extremely not delicious.",
           "links": [
             {
-              "text": "More details",
+              "text": "More details ➞",
               "href": "http://www.avocadosource.com/cas_yearbooks/cas_27_1942/cas_1942_pg_056-064.pdf"
             }
           ],
@@ -28,10 +28,14 @@
       "points": [
         {
           "heading": "Mesocarp",
-          "description": "The thing about mesocarps is...",
+          "description": "This middle part though is very delicious indeed.",
           "links": [
             {
-              "text": "Link 1",
+              "text": "Link 1 ➞",
+              "href": "https://www.folkmusic.com"
+            },
+            {
+              "text": "Link 2 ➞",
               "href": "https://www.folkmusic.com"
             }
           ],
@@ -47,10 +51,10 @@
       "points": [
         {
           "heading": "Endocarp",
-          "description": "The thing about endocarps is...",
+          "description": "The endocarp, like the exocarp, is not delicious and you will be putting this in the trash.",
           "links": [
             {
-              "text": "Link 1",
+              "text": "Link 1 ➞",
               "href": "https://www.folkmusic.com"
             }
           ],
@@ -59,7 +63,7 @@
         },
         {
           "heading": "Inside every endocarp...",
-          "description": "There's a little timer that will decide when the avocado goes bad",
+          "description": "There's a little timer that will decide when the avocado goes bad.",
           "links": [],
           "position": { "x": 50, "y": 50 },
           "image": "bomb.svg"
