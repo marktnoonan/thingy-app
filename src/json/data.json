@@ -1,0 +1,70 @@
+{
+  "title": "Avocado Diagram",
+  "subtitle": "The ticking time-fruit",
+  "layers": [
+    {
+      "name": "Outer Shell",
+      "color": "#233822",
+      "image": "shell.png",
+      "points": [
+        {
+          "heading": "Exocarp",
+          "description": "The thing about exocarps is...",
+          "links": [
+            {
+              "text": "More details",
+              "href": "http://www.avocadosource.com/cas_yearbooks/cas_27_1942/cas_1942_pg_056-064.pdf"
+            }
+          ],
+          "position": { "x": 40, "y": 40 },
+          "image": null
+        }
+      ]
+    },
+    {
+      "name": "Flesh of the fruit",
+      "color": "#C0E7A0",
+      "image": "flesh.png",
+      "points": [
+        {
+          "heading": "Mesocarp",
+          "description": "The thing about mesocarps is...",
+          "links": [
+            {
+              "text": "Link 1",
+              "href": "https://www.folkmusic.com"
+            }
+          ],
+          "position": { "x": 60, "y": 60 },
+          "image": null
+        }
+      ]
+    },
+    {
+      "name": "Seed",
+      "color": "#BF9000",
+      "image": "stone.png",
+      "points": [
+        {
+          "heading": "Endocarp",
+          "description": "The thing about endocarps is...",
+          "links": [
+            {
+              "text": "Link 1",
+              "href": "https://www.folkmusic.com"
+            }
+          ],
+          "position": { "x": 30, "y": 30 },
+          "image": null
+        },
+        {
+          "heading": "Inside every endocarp...",
+          "description": "There's a little timer that will decide when the avocado goes bad",
+          "links": [],
+          "position": { "x": 50, "y": 50 },
+          "image": "bomb.svg"
+        }
+      ]
+    }
+  ]
+}
