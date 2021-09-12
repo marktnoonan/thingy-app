@@ -43,7 +43,7 @@
           </tab>
         </tab-list>
         <tab-panel
-          v-for="(layer, index) in diagramData.layers"
+          v-for="layer in diagramData.layers"
           :key="layer.name"
           class="tab-panel"
         >
@@ -57,9 +57,7 @@
               width="400"
             />
             <transition name="fade-slow" mode="out-in">
-              <div class="popover-layer" v-if="activeTab === index">
-                {{ activeTab === index }}
-                {{ activeTab }} {{ index }}
+              <div class="popover-layer" v-if="revealButtons">
                 <Popover v-for="point in layer.points" :key="point.name">
                   <PopoverButton
                     class="popover-activator"
@@ -107,7 +105,7 @@
 </template>
 
 <script lang="ts" setup>
-import { ref, watch } from "vue";
+import { ref, watch, triggerRef } from "vue";
 import diagramData from "../json/data";
 import { Popover, PopoverButton, PopoverPanel } from "@headlessui/vue";
 import { useWindowScroll } from "@vueuse/core";
@@ -115,6 +113,7 @@ import { useWindowScroll } from "@vueuse/core";
 const noJs = ref(false);
 const activeTab = ref(0);
 const tabWrapperKey = ref(false);
+const revealButtons = ref(false);
 const { y: scrollY } = useWindowScroll();
 
 watch(scrollY, (val) => {
@@ -131,7 +130,15 @@ watch(scrollY, (val) => {
   } else if (activeTab.value != 0) {
     activeTab.value = 0;
     tabWrapperKey.value = !tabWrapperKey.value;
+    triggerRef(activeTab);
   }
+});
+
+watch(activeTab, () => {
+  revealButtons.value = false;
+  setTimeout(() => {
+    revealButtons.value = true;
+  }, 100);
 });
 </script>
 
@@ -181,7 +188,7 @@ watch(scrollY, (val) => {
 
 .popover-panel {
   position: absolute;
-  background: rgba(255, 255, 255, 0.8);
+  background: rgba(255, 255, 255, 0.9);
   border: 1px solid #ddd;
   border-radius: 0 8px 8px 8px;
   padding: 12px;
@@ -259,7 +266,11 @@ section header > * {
 
 .fade-slow-enter-active,
 .fade-slow-leave-active {
-  transition: opacity 0.6s linear 1s;
+  transition: opacity 0.6s linear 0.5s;
+}
+
+.fade-slow-leave-active {
+  transition: opacity 0s;
 }
 
 .fade-slow-enter-from,
