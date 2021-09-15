@@ -134,12 +134,16 @@ watch(scrollY, (val) => {
   }
 });
 
-watch(activeTab, () => {
-  revealButtons.value = false;
-  setTimeout(() => {
-    revealButtons.value = true;
-  }, 100);
-});
+watch(
+  activeTab,
+  () => {
+    revealButtons.value = false;
+    setTimeout(() => {
+      revealButtons.value = true;
+    }, 100);
+  },
+  { immediate: true }
+);
 </script>
 
 <!-- Add "scoped" attribute to limit CSS to this component only -->
@@ -280,23 +284,24 @@ section header > * {
 
 .tab-panel {
   position: absolute;
+  left: 120px;
 }
 
 .tab-panel.is-active {
-  animation: fade-in 1s forwards;
+  animation: fade-in 0.6s forwards;
 }
 .tab-panel:not(.is-active) {
-  animation: fade-in 1s reverse;
+  animation: fade-in 0.6s reverse;
 }
 
 @keyframes fade-in {
   0% {
     opacity: 0;
-    left: 130px;
+    transform: scale(0.96);
   }
   100% {
     opacity: 1;
-    left: 120px;
+    transform: scale(1);
   }
 }
 </style>
