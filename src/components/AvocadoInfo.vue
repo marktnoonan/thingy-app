@@ -6,6 +6,10 @@
     >
       "Toggle JS"
     </button>
+
+
+
+
     <!-- NO-JS example -->
     <article v-if="diagramData && noJs">
       <h2>{{ diagramData.title }}</h2>
@@ -17,7 +21,7 @@
       >
         <header>
           <div class="swatch" :style="{ backgroundColor: layer.color }">
-            <img width="76" :src="require(`@/assets/${layer.image}`)" alt="" />
+            <img width="150" :src="require(`@/assets/${layer.image}`)" alt="" />
           </div>
           <h3>{{ layer.name }}</h3>
         </header>
@@ -34,6 +38,15 @@
         </ul>
       </section>
     </article>
+
+
+
+
+
+
+
+
+
     <div v-else>
       <tabs v-model="activeTab" class="tab-container" :key="tabWrapperKey">
         <tab-list class="tabs-list" :label="diagramData.title">
@@ -154,9 +167,8 @@ watch(
 }
 
 .swatch {
-  height: 60px;
-  width: 60px;
-  border-radius: 50px;
+  height: 150px;
+  width: 150px;
   display: grid;
   align-content: center;
   overflow: hidden;
