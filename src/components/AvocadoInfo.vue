@@ -1,27 +1,23 @@
 <template>
   <div class="avocado-info">
+    <button @click="noJs = !noJs" style="position: fixed; left: 30px; top: 10px">"Toggle JS"</button>
     <button
-      @click="noJs = !noJs"
-      style="position: fixed; left: 30px; top: 10px"
-    >
-      "Toggle JS"
-    </button>
-
-
-
+      @click="diagramType === 'tabs' ? diagramType = 'carousel' : diagramType = 'tabs'"
+      style="position: fixed; left: 130px; top: 10px"
+    >Toggle diagram type</button>
 
     <!-- NO-JS example -->
-    <article v-if="diagramData && noJs">
+    <div v-if="diagramData && noJs">
       <h2>{{ diagramData.title }}</h2>
       <p>{{ diagramData.subtitle }}</p>
-      <section
+      <article
         v-for="layer in diagramData.layers"
         :key="layer.name"
         style="border-bottom: 1px solid #eee; margin-bottom: 12px"
       >
         <header>
           <div class="swatch" :style="{ backgroundColor: layer.color }">
-            <img width="150" :src="require(`@/assets/${layer.image}`)" alt="" />
+            <img width="150" :src="require(`@/assets/${layer.image}`)" alt />
           </div>
           <h3>{{ layer.name }}</h3>
         </header>
@@ -36,37 +32,26 @@
             </ul>
           </li>
         </ul>
-      </section>
-    </article>
+      </article>
+    </div>
 
-
-
-
-
-
-
-
-
-    <div v-else>
-      <tabs v-model="activeTab" class="tab-container" :key="tabWrapperKey">
+    <!-- tabs example -  -->
+    <div v-else-if="gimmeTabs">
+      <tabs v-model="activeTab" class="tab-container" :key="tabWrapperKey" v-hover="handleHover">
         <tab-list class="tabs-list" :label="diagramData.title">
           <tab v-for="layer in diagramData.layers" :key="layer.name">
-            ⬤
+            <span aria-hidden>⬤</span>
             <span class="sr-only">{{ layer.name }}</span>
           </tab>
         </tab-list>
-        <tab-panel
-          v-for="layer in diagramData.layers"
-          :key="layer.name"
-          class="tab-panel"
-        >
+        <tab-panel v-for="layer in diagramData.layers" :key="layer.name" class="tab-panel">
           <div class="image-container">
             <img
               :src="require(`@/assets/${layer.image}`)"
               :style="{
                 borderColor: layer.color,
               }"
-              alt=""
+              alt
               width="400"
             />
             <transition name="fade-slow" mode="out-in">
@@ -78,7 +63,9 @@
                       top: `${point.position.y}%`,
                       left: `${point.position.x}%`,
                     }"
-                    >i
+                  >
+                    <span aria-hidden="true">i</span>
+                    <span class="sr-only">{{ point.heading }}</span>
                   </PopoverButton>
                   <transition name="fade">
                     <PopoverPanel
@@ -88,46 +75,107 @@
                         left: `${point.position.x + 6}%`,
                       }"
                     >
-                      <img
-                        v-if="point.image"
-                        width="50"
-                        :src="require(`@/assets/${point.image}`)"
-                      />
+                      <img v-if="point.image" width="50" :src="require(`@/assets/${point.image}`)" />
                       <h3>
                         <b>{{ point.heading }}</b>
                       </h3>
                       <p>{{ point.description }}</p>
                       <ul>
                         <li v-for="link in point.links" :key="link.href">
-                          <a :href="link.href">
-                            {{ link.text }}
-                          </a>
+                          <a :href="link.href">{{ link.text }}</a>
                         </li>
                       </ul>
                     </PopoverPanel>
                   </transition>
                 </Popover>
               </div>
-              <div v-else>Loading</div>
             </transition>
           </div>
         </tab-panel>
       </tabs>
     </div>
+
+    <!-- carousel example -->
+    <div v-else-if="gimmeCarousel">
+      <carousel :items-to-show="1" :transition="0">
+        <template #slides="{ currentSlide }">
+          <slide v-for="(layer, index) in diagramData.layers" :key="layer.name">
+            <transition name="fade" mode="out-in">
+              <div class="image-container" :key="currentSlide">
+                <img
+                  :src="require(`@/assets/${layer.image}`)"
+                  :style="{
+                    borderColor: layer.color,
+                  }"
+                  alt
+                  width="400"
+                />
+                <div
+                  class="popover-layer"
+                  v-if="(currentSlide === index) || (currentSlide === -1 && index === 0)"
+                >
+                  <Popover v-for="point in layer.points" :key="point.name">
+                    <PopoverButton
+                      class="popover-activator"
+                      :style="{
+                        top: `${point.position.y}%`,
+                        left: `${point.position.x}%`,
+                      }"
+                    >
+                      <span aria-hidden="true">i</span>
+                      <span class="sr-only">{{ point.heading }}</span>
+                    </PopoverButton>
+                    <PopoverPanel
+                      class="popover-panel"
+                      :style="{
+                        top: `${point.position.y + 3}%`,
+                        left: `${point.position.x + 6}%`,
+                      }"
+                    >
+                      <img v-if="point.image" width="50" :src="require(`@/assets/${point.image}`)" />
+                      <h3>
+                        <b>{{ point.heading }}</b>
+                      </h3>
+                      <p>{{ point.description }}</p>
+                      <ul>
+                        <li v-for="link in point.links" :key="link.href">
+                          <a :href="link.href">{{ link.text }}</a>
+                        </li>
+                      </ul>
+                    </PopoverPanel>
+                  </Popover>
+                </div>
+              </div>
+            </transition>
+          </slide>
+        </template>
+        <template #addons>
+          <pagination />
+        </template>
+      </carousel>
+    </div>
   </div>
 </template>
 
 <script lang="ts" setup>
-import { ref, watch, triggerRef } from "vue";
+import { ref, watch, triggerRef, computed } from "vue";
 import diagramData from "../json/data";
 import { Popover, PopoverButton, PopoverPanel } from "@headlessui/vue";
 import { useWindowScroll } from "@vueuse/core";
+import 'vue3-carousel/dist/carousel.css';
+import { Carousel, Slide, Pagination, Navigation } from 'vue3-carousel';
 
 const noJs = ref(false);
 const activeTab = ref(0);
 const tabWrapperKey = ref(false);
 const revealButtons = ref(false);
 const { y: scrollY } = useWindowScroll();
+const handleHover = ({ hovering }: { hovering: boolean }) => {
+  revealButtons.value = hovering
+}
+const diagramType = ref<'tabs' | 'carousel'>('carousel')
+const gimmeTabs = computed(() => diagramType.value === 'tabs')
+const gimmeCarousel = computed(() => diagramType.value === 'carousel')
 
 watch(scrollY, (val) => {
   if (val > 20 && val < 200) {
@@ -147,16 +195,6 @@ watch(scrollY, (val) => {
   }
 });
 
-watch(
-  activeTab,
-  () => {
-    revealButtons.value = false;
-    setTimeout(() => {
-      revealButtons.value = true;
-    }, 100);
-  },
-  { immediate: true }
-);
 </script>
 
 <!-- Add "scoped" attribute to limit CSS to this component only -->
@@ -282,11 +320,11 @@ section header > * {
 
 .fade-slow-enter-active,
 .fade-slow-leave-active {
-  transition: opacity 0.6s linear 0.5s;
+  transition: opacity 0.6s linear 0.2s;
 }
 
 .fade-slow-leave-active {
-  transition: opacity 0s;
+  transition: opacity 0.4s;
 }
 
 .fade-slow-enter-from,
