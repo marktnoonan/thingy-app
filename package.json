@@ -13,6 +13,7 @@
     "@vueuse/core": "^6.1.0",
     "@vueuse/gesture": "^1.0.0",
     "core-js": "^3.6.5",
+    "gsap": "^3.8.0",
     "vue": "^3.0.0",
     "vue3-accessible-tabs": "^0.7.0",
     "vue3-carousel": "^0.1.27"

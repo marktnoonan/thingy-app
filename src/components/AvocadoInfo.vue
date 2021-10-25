@@ -1,11 +1,23 @@
 <template>
   <div class="avocado-info">
+    <!-- Greensock example -->
+    <div ref="animationHolder" class="animation-holder">
+      Hi! animation holder
+      <div class="animate-me"></div>
+    </div>
+
+    <div class="container">
+      <button @click="playFunction">PLAY</button>
+      <button @click="pause">PAUSE</button>
+      <button @click="restart">RESTART</button>
+    </div>
+
     <button @click="noJs = !noJs" style="position: fixed; left: 30px; top: 10px">"Toggle JS"</button>
     <button
       @click="diagramType === 'tabs' ? diagramType = 'carousel' : diagramType = 'tabs'"
       style="position: fixed; left: 130px; top: 10px"
     >Toggle diagram type</button>
-
+    Active diagram type: {{ diagramType }}
     <!-- NO-JS example -->
     <div v-if="diagramData && noJs">
       <h2>{{ diagramData.title }}</h2>
@@ -54,7 +66,7 @@
               alt
               width="400"
             />
-            <transition name="fade-slow" mode="out-in">
+            <transition name="fade-slow">
               <div class="popover-layer" v-if="revealButtons">
                 <Popover v-for="point in layer.points" :key="point.name">
                   <PopoverButton
@@ -158,13 +170,102 @@
 </template>
 
 <script lang="ts" setup>
-import { ref, watch, triggerRef, computed } from "vue";
+import { ref, watch, triggerRef, computed, onMounted } from "vue";
 import diagramData from "../json/data";
 import { Popover, PopoverButton, PopoverPanel } from "@headlessui/vue";
-import { useWindowScroll } from "@vueuse/core";
+import { tryOnUnmounted, useWindowScroll } from "@vueuse/core";
 import 'vue3-carousel/dist/carousel.css';
-import { Carousel, Slide, Pagination, Navigation } from 'vue3-carousel';
+import { Carousel, Slide, Pagination } from 'vue3-carousel';
+import { gsap } from 'gsap';
+import { ScrollTrigger } from "gsap/ScrollTrigger";
 
+gsap.registerPlugin(ScrollTrigger);
+
+let timeline
+const animationHolder = ref(null)
+
+onMounted(() => {
+  console.log('MOUNTED!!')
+  timeline = gsap.timeline(
+    {
+      scrollTrigger: {
+        trigger: "body",
+        markers: true,
+        scrub: true,
+        pin: true,
+        start: 'top'
+      },
+    }
+  );
+
+  timeline.to('.animate-me', {
+    x: 750,
+    rotation: 360,
+    duration: 9,
+  })
+
+  timeline.to('.animate-me', {
+    x: 500,
+    y: 40,
+    rotation: 230,
+    duration: 9,
+  })
+
+  timeline.to('.animate-me', {
+    x: 500,
+    y: 100,
+    rotation: 100,
+    duration: 9,
+    backgroundColor: 'purple'
+  })
+
+  timeline.to('.animate-me', {
+    rotation: -560,
+    duration: 90,
+    backgroundColor: 'green',
+    borderRadius: 500,
+  })
+
+
+  timeline.to('.animate-me', {
+    scale: 3,
+    duration: 9,
+    backgroundColor: 'hotpink',
+    height: 130,
+    width: 130
+  })
+
+    timeline.to('.animate-me', {
+    scale: 1,
+    x: 0,
+    y: 0,
+    rotation: 0,
+    duration: 100
+  })
+
+    timeline.to('.animate-me', {
+    scale: 1,
+    x: 0,
+    y: 0,
+    rotation: 0,
+    duration: 100
+  })
+
+
+})
+
+
+function playFunction() {
+  timeline.play()
+}
+
+function pause() {
+  timeline.pause()
+}
+
+function restart() {
+  timeline.restart()
+}
 const noJs = ref(false);
 const activeTab = ref(0);
 const tabWrapperKey = ref(false);
@@ -195,10 +296,33 @@ watch(scrollY, (val) => {
   }
 });
 
+
 </script>
 
 <!-- Add "scoped" attribute to limit CSS to this component only -->
 <style scoped>
+.animation-holder {
+  height: 200px;
+  width: 400px;
+  border: 1px solid green;
+}
+
+.container {
+  padding: 30px;
+  border: 2px solid palevioletred;
+}
+
+.container button {
+  height: 70px;
+  width: 70px;
+  margin: 40px;
+}
+
+.animate-me {
+  background-color: red;
+  width: 100px;
+  height: 50px;
+}
 .avocado-info {
   max-width: 800px;
   margin: auto;
