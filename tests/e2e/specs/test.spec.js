@@ -5,7 +5,8 @@
 
 describe("Aaaah! Vocado", () => {
   it("Loads", () => {
-    cy.visit("/").pause();
+    cy.visit("/")
+    cy.get('nothing')
   });
 });
 
