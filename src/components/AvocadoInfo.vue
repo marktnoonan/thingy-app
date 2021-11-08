@@ -1,15 +1,26 @@
 <template>
   <suspense>
-    <div class="avocado-info" :class="showing">
+    <div class="avocado-info" :class="typeToDisplay">
       <button
         @click="noJs = !noJs"
         style="position: fixed; left: 30px; top: 10px"
       >
         "Toggle JS"
       </button>
-
-      Active Tab: {{ activeTab }} <br />
-      Thing we are showing: {{ showing }}
+      <!-- <div
+        style="
+          position: absolute;
+          background-color: white;
+          top: 0;
+          z-index: 20000;
+          text-align: left;
+          padding: 12px;
+        "
+      >
+        Active Tab: {{ activeTab }}
+        <br />
+        What we are showing: {{ typeToDisplay }}
+      </div> -->
       <!-- NO-JS example -->
       <div v-if="diagramData && noJs">
         <h2>{{ diagramData.title }}</h2>
@@ -44,8 +55,8 @@
         </article>
       </div>
 
-      <!-- tabs example -  -->
-      <div v-else-if="gimmeTabs">
+      <!-- tabs example -->
+      <div v-else>
         <div>
           <tabs v-model="activeTab" class="tab-container" :key="activeTab">
             <tab-list class="tabs-list" :label="diagramData.title">
@@ -83,7 +94,6 @@
                       }"
                     >
                       <span aria-hidden="true">i</span>
-                      <span class="sr-only">{{ point.heading }}</span>
                     </PopoverButton>
                     <PopoverPanel
                       class="popover-panel"
@@ -134,20 +144,18 @@
 </template>
 
 <script lang="ts" setup>
-import { ref, computed, onMounted, nextTick } from "vue";
+import { ref, onMounted, nextTick } from "vue";
 import diagramData from "../json/data";
 import { Popover, PopoverButton, PopoverPanel } from "@headlessui/vue";
-import "vue3-carousel/dist/carousel.css";
 import { gsap } from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 
 gsap.registerPlugin(ScrollTrigger);
 
 let timeline: gsap.core.Timeline;
-const showing = ref("tabs");
+const typeToDisplay = ref("tabs");
 
 onMounted(() => {
-  console.log("MOUNTED!!");
   timeline = gsap.timeline({
     scrollTrigger: {
       trigger: "body",
@@ -159,8 +167,7 @@ onMounted(() => {
     },
   });
 
-  diagramData.layers.forEach((item, index) => {
-    console.log(item, index, diagramData.layers.length - index - 1);
+  diagramData.layers.forEach((item: never, index: number) => {
     const layerPosition = diagramData.layers.length - index - 1;
     if (index === diagramData.layers.length - 1) {
       return;
@@ -171,23 +178,31 @@ onMounted(() => {
         opacity: 1,
       },
       {
-        scale: 1.2,
+        scale: 1.06,
+        x: 10,
+        y: -10,
+        rotate: -4,
         opacity: 0,
-        duration: 2,
-
+        duration: 1,
+        ease: "sine",
         onStart() {
           activeTab.value = index + 1;
-          showing.value = "animation";
-        },
-        onReverseComplete() {
-          activeTab.value = 0;
-          showing.value = "tabs";
+          typeToDisplay.value = "animation";
         },
         onComplete() {
-          showing.value = "tabs";
+          typeToDisplay.value = "tabs";
+        },
+        onReverseComplete() {
+          activeTab.value = index;
+          typeToDisplay.value = "tabs";
+        },
+        onUpdate() {
+          if (timeline.scrollTrigger?.direction === -1) {
+            typeToDisplay.value = "animation";
+          }
         },
       },
-      `+=0.2`
+      `+=1`
     );
   });
 });
@@ -202,9 +217,6 @@ const handleTabClick = () => {
     );
   });
 };
-
-const diagramType = ref<"tabs" | "carousel">("tabs");
-const gimmeTabs = computed(() => diagramType.value === "tabs");
 </script>
 
 <style scoped>
@@ -251,7 +263,6 @@ const gimmeTabs = computed(() => diagramType.value === "tabs");
 .image-container > img {
   border-radius: 50px/40px;
   border: 3px solid;
-  box-shadow: 0 0 0 2px;
 }
 
 .avocado-info.animation .popover-layer,
@@ -345,7 +356,7 @@ section header > * {
   z-index: 200;
   pointer-events: none;
   left: 118px;
-  top: 122px;
+  top: 82 px;
 }
 .avocado-info.tabs .greensock-deck {
   opacity: 0;
