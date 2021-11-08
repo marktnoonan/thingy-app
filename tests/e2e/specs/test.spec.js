@@ -1,48 +1,36 @@
-// import userEvent from '@testing-library/user-event'
-
-
-
-
 describe("Aaaah! Vocado", () => {
-  it("Loads", () => {
-    cy.visit("/")
-    cy.get('nothing')
+  it("The plain HTML version works", () => {
+    cy.visit("/");
+    cy.contains("Toggle JS").click();
+    cy.contains("h2", "Avocado Diagram").should("be.visible");
+  });
+
+  it("The tab-control interactions work", () => {
+    cy.visit("/");
+
+    // click the 2nd tab
+    cy.get("[aria-label='Avocado Diagram']").within(() => {
+      cy.get("a").eq(1).click(); // needs accessible name
+    });
+
+    // weird selector that only works by coincidence of how Headless UI is implemented - we should use accessible name
+    cy.get(".popover-activator:not([tabindex])").click();
+
+    cy.contains("h3", "Mesocarp").should("be.visible").type("{esc}");
+
+    cy.contains("h3", "Mesocarp").should("not.exist");
+  });
+
+  it.only("The scroll interactions work", () => {
+    cy.visit("/");
+
+    cy.window().then(async (win) => {
+      win.timeline.scrollTrigger.scroll(600);
+      cy.wait(0);
+      // weird selector that only works by coincidence of how Headless UI is implemented - we should use accessible name
+      cy.get(".popover-activator").eq(3).click();
+
+      cy.contains("h3", "Inside every").should("be.visible");
+    });
   });
 });
-
-
-
-// describe("Button {enter} test", () => {
-//   it("Enter toggles accordion panels", () => {
-//     cy.visit("https://www.w3.org/TR/wai-aria-practices-1.2/examples/accordion/accordion.html");
-
-//     cy.get('h3').eq(1).then($el => {
-//       $el[0].addEventListener('click', (e) => {
-//         e.stopPropagation()
-//       })
-//     })
-
-//     cy.get("button").eq(1).type("{enter}");
-
-//     // cy.get('button').then($buttons => userEvent.type($buttons[1], '{enter}'));
-//     // cy.get('button').then($buttons => userEvent.type($buttons[1], '{enter}'));
-
-//     // cy.get("button").eq(1).type("{enter}"); // expand the second panel
-//     // cy.get("button").eq(1).should("have.attr", "aria-expanded", "true"); // it has the attribute
-//     // cy.get("[role=region]").eq(0).should("have.attr", "hidden"); // first panel is now hidden
-//     // cy.get("button").eq(0).type("{enter}"); // expand the first panel
-//     // cy.get("button").eq(0).should("have.attr", "aria-disabled", "true"); // first button is now disabled
-//     // cy.get("button").eq(1).should("have.attr", "aria-expanded", "false"); // the second panel now has false
-//     // cy.get("[role=region]").eq(0).should("not.have.attr", "hidden"); // first panel is visible
-//   });
-// });
-
-
-
-// describe("Button {enter} test", () => {
-//   it("Enter toggles accordion panels", () => {
-//     cy.visit("localhost:8080");
-
-//     cy.get('.parent button').then($buttons => userEvent.type($buttons[0], '{enter}'));
-//   });
-// });
