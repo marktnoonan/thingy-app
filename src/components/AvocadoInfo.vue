@@ -1,119 +1,68 @@
 <template>
-  <div class="avocado-info">
-    <!-- Greensock example -->
-    <div ref="animationHolder" class="animation-holder">
-      Hi! animation holder
-      <div class="animate-me"></div>
-    </div>
-
-    <div class="container">
-      <button @click="playFunction">PLAY</button>
-      <button @click="pause">PAUSE</button>
-      <button @click="restart">RESTART</button>
-    </div>
-
-    <button @click="noJs = !noJs" style="position: fixed; left: 30px; top: 10px">"Toggle JS"</button>
-    <button
-      @click="diagramType === 'tabs' ? diagramType = 'carousel' : diagramType = 'tabs'"
-      style="position: fixed; left: 130px; top: 10px"
-    >Toggle diagram type</button>
-    Active diagram type: {{ diagramType }}
-    <!-- NO-JS example -->
-    <div v-if="diagramData && noJs">
-      <h2>{{ diagramData.title }}</h2>
-      <p>{{ diagramData.subtitle }}</p>
-      <article
-        v-for="layer in diagramData.layers"
-        :key="layer.name"
-        style="border-bottom: 1px solid #eee; margin-bottom: 12px"
+  <suspense>
+    <div class="avocado-info" :class="showing">
+      <button
+        @click="noJs = !noJs"
+        style="position: fixed; left: 30px; top: 10px"
       >
-        <header>
-          <div class="swatch" :style="{ backgroundColor: layer.color }">
-            <img width="150" :src="require(`@/assets/${layer.image}`)" alt />
-          </div>
-          <h3>{{ layer.name }}</h3>
-        </header>
-        <ul>
-          <li v-for="point in layer.points" :key="point.heading">
-            <h4>{{ point.heading }}</h4>
-            <p>{{ point.description }}</p>
-            <ul>
-              <li v-for="link in point.links" :key="link.href">
-                <a :href="link.href">{{ link.text }}</a>
-              </li>
-            </ul>
-          </li>
-        </ul>
-      </article>
-    </div>
+        "Toggle JS"
+      </button>
 
-    <!-- tabs example -  -->
-    <div v-else-if="gimmeTabs">
-      <tabs v-model="activeTab" class="tab-container" :key="tabWrapperKey" v-hover="handleHover">
-        <tab-list class="tabs-list" :label="diagramData.title">
-          <tab v-for="layer in diagramData.layers" :key="layer.name">
-            <span aria-hidden>⬤</span>
-            <span class="sr-only">{{ layer.name }}</span>
-          </tab>
-        </tab-list>
-        <tab-panel v-for="layer in diagramData.layers" :key="layer.name" class="tab-panel">
-          <div class="image-container">
-            <img
-              :src="require(`@/assets/${layer.image}`)"
-              :style="{
-                borderColor: layer.color,
-              }"
-              alt
-              width="400"
-            />
-            <transition name="fade-slow">
-              <div class="popover-layer" v-if="revealButtons">
-                <Popover v-for="point in layer.points" :key="point.name">
-                  <PopoverButton
-                    class="popover-activator"
-                    :style="{
-                      top: `${point.position.y}%`,
-                      left: `${point.position.x}%`,
-                    }"
-                  >
-                    <span aria-hidden="true">i</span>
-                    <span class="sr-only">{{ point.heading }}</span>
-                  </PopoverButton>
-                  <transition name="fade">
-                    <PopoverPanel
-                      class="popover-panel"
-                      :style="{
-                        top: `${point.position.y + 3}%`,
-                        left: `${point.position.x + 6}%`,
-                      }"
-                    >
-                      <img v-if="point.image" width="50" :src="require(`@/assets/${point.image}`)" />
-                      <h3>
-                        <b>{{ point.heading }}</b>
-                      </h3>
-                      <p>{{ point.description }}</p>
-                      <ul>
-                        <li v-for="link in point.links" :key="link.href">
-                          <a :href="link.href">{{ link.text }}</a>
-                        </li>
-                      </ul>
-                    </PopoverPanel>
-                  </transition>
-                </Popover>
-              </div>
-            </transition>
-          </div>
-        </tab-panel>
-      </tabs>
-    </div>
+      Active Tab: {{ activeTab }} <br />
+      Thing we are showing: {{ showing }}
+      <!-- NO-JS example -->
+      <div v-if="diagramData && noJs">
+        <h2>{{ diagramData.title }}</h2>
+        <p>{{ diagramData.subtitle }}</p>
+        <article
+          v-for="layer in diagramData.layers"
+          :key="layer.name"
+          style="border-bottom: 1px solid #eee; margin-bottom: 12px"
+        >
+          <header>
+            <div class="swatch" :style="{ backgroundColor: layer.color }">
+              <img width="150" :src="require(`@/assets/${layer.image}`)" alt />
+            </div>
+            <h3>{{ layer.name }}</h3>
+          </header>
+          <ul>
+            <li v-for="point in layer.points" :key="point.heading">
+              <h4>{{ point.heading }}</h4>
+              <img
+                v-if="point.image"
+                width="40"
+                :src="require(`@/assets/${point.image}`)"
+              />
+              <p>{{ point.description }}</p>
+              <ul>
+                <li v-for="link in point.links" :key="link.href">
+                  <a :href="link.href">{{ link.text }}</a>
+                </li>
+              </ul>
+            </li>
+          </ul>
+        </article>
+      </div>
 
-    <!-- carousel example -->
-    <div v-else-if="gimmeCarousel">
-      <carousel :items-to-show="1" :transition="0">
-        <template #slides="{ currentSlide }">
-          <slide v-for="(layer, index) in diagramData.layers" :key="layer.name">
-            <transition name="fade" mode="out-in">
-              <div class="image-container" :key="currentSlide">
+      <!-- tabs example -  -->
+      <div v-else-if="gimmeTabs">
+        <div>
+          <tabs v-model="activeTab" class="tab-container" :key="activeTab">
+            <tab-list class="tabs-list" :label="diagramData.title">
+              <tab
+                v-for="layer in diagramData.layers"
+                :key="layer.name"
+                @click="handleTabClick"
+              >
+                <span>⬤</span>
+              </tab>
+            </tab-list>
+            <tab-panel
+              v-for="layer in diagramData.layers"
+              :key="layer.name"
+              class="tab-panel"
+            >
+              <div class="image-container">
                 <img
                   :src="require(`@/assets/${layer.image}`)"
                   :style="{
@@ -121,11 +70,10 @@
                   }"
                   alt
                   width="400"
+                  height="400"
                 />
-                <div
-                  class="popover-layer"
-                  v-if="(currentSlide === index) || (currentSlide === -1 && index === 0)"
-                >
+
+                <div class="popover-layer">
                   <Popover v-for="point in layer.points" :key="point.name">
                     <PopoverButton
                       class="popover-activator"
@@ -144,7 +92,11 @@
                         left: `${point.position.x + 6}%`,
                       }"
                     >
-                      <img v-if="point.image" width="50" :src="require(`@/assets/${point.image}`)" />
+                      <img
+                        v-if="point.image"
+                        width="50"
+                        :src="require(`@/assets/${point.image}`)"
+                      />
                       <h3>
                         <b>{{ point.heading }}</b>
                       </h3>
@@ -158,148 +110,103 @@
                   </Popover>
                 </div>
               </div>
-            </transition>
-          </slide>
-        </template>
-        <template #addons>
-          <pagination />
-        </template>
-      </carousel>
+            </tab-panel>
+          </tabs>
+        </div>
+        <div class="greensock-deck">
+          <img
+            class="greensock-deck-image"
+            v-for="(layer, i) in [...diagramData.layers].reverse()"
+            :class="'greensock-image-' + i"
+            :key="layer.name"
+            :src="require(`@/assets/${layer.image}`)"
+            :style="{
+              borderColor: layer.color,
+            }"
+            width="400"
+            height="400"
+            alt
+          />
+        </div>
+      </div>
     </div>
-  </div>
+  </suspense>
 </template>
 
 <script lang="ts" setup>
-import { ref, watch, triggerRef, computed, onMounted } from "vue";
+import { ref, computed, onMounted, nextTick } from "vue";
 import diagramData from "../json/data";
 import { Popover, PopoverButton, PopoverPanel } from "@headlessui/vue";
-import { tryOnUnmounted, useWindowScroll } from "@vueuse/core";
-import 'vue3-carousel/dist/carousel.css';
-import { Carousel, Slide, Pagination } from 'vue3-carousel';
-import { gsap } from 'gsap';
+import "vue3-carousel/dist/carousel.css";
+import { gsap } from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 
 gsap.registerPlugin(ScrollTrigger);
 
-let timeline
-const animationHolder = ref(null)
+let timeline: gsap.core.Timeline;
+const showing = ref("tabs");
 
 onMounted(() => {
-  console.log('MOUNTED!!')
-  timeline = gsap.timeline(
-    {
-      scrollTrigger: {
-        trigger: "body",
-        markers: true,
-        scrub: true,
-        pin: true,
-        start: 'top'
+  console.log("MOUNTED!!");
+  timeline = gsap.timeline({
+    scrollTrigger: {
+      trigger: "body",
+      markers: false,
+      scrub: true,
+      pin: true,
+      start: "-20",
+      end: "+580",
+    },
+  });
+
+  diagramData.layers.forEach((item, index) => {
+    console.log(item, index, diagramData.layers.length - index - 1);
+    const layerPosition = diagramData.layers.length - index - 1;
+    if (index === diagramData.layers.length - 1) {
+      return;
+    }
+    timeline.fromTo(
+      `.greensock-image-${layerPosition}`,
+      {
+        opacity: 1,
       },
-    }
-  );
+      {
+        scale: 1.2,
+        opacity: 0,
+        duration: 2,
 
-  timeline.to('.animate-me', {
-    x: 750,
-    rotation: 360,
-    duration: 9,
-  })
-
-  timeline.to('.animate-me', {
-    x: 500,
-    y: 40,
-    rotation: 230,
-    duration: 9,
-  })
-
-  timeline.to('.animate-me', {
-    x: 500,
-    y: 100,
-    rotation: 100,
-    duration: 9,
-    backgroundColor: 'purple'
-  })
-
-  timeline.to('.animate-me', {
-    rotation: -560,
-    duration: 90,
-    backgroundColor: 'green',
-    borderRadius: 500,
-  })
-
-
-  timeline.to('.animate-me', {
-    scale: 3,
-    duration: 9,
-    backgroundColor: 'hotpink',
-    height: 130,
-    width: 130
-  })
-
-    timeline.to('.animate-me', {
-    scale: 1,
-    x: 0,
-    y: 0,
-    rotation: 0,
-    duration: 100
-  })
-
-    timeline.to('.animate-me', {
-    scale: 1,
-    x: 0,
-    y: 0,
-    rotation: 0,
-    duration: 100
-  })
-
-
-})
-
-
-function playFunction() {
-  timeline.play()
-}
-
-function pause() {
-  timeline.pause()
-}
-
-function restart() {
-  timeline.restart()
-}
-const noJs = ref(false);
-const activeTab = ref(0);
-const tabWrapperKey = ref(false);
-const revealButtons = ref(false);
-const { y: scrollY } = useWindowScroll();
-const handleHover = ({ hovering }: { hovering: boolean }) => {
-  revealButtons.value = hovering
-}
-const diagramType = ref<'tabs' | 'carousel'>('carousel')
-const gimmeTabs = computed(() => diagramType.value === 'tabs')
-const gimmeCarousel = computed(() => diagramType.value === 'carousel')
-
-watch(scrollY, (val) => {
-  if (val > 20 && val < 200) {
-    if (activeTab.value != 1) {
-      activeTab.value = 1;
-      tabWrapperKey.value = !tabWrapperKey.value;
-    }
-  } else if (val > 199) {
-    if (activeTab.value != 2) {
-      activeTab.value = 2;
-      tabWrapperKey.value = !tabWrapperKey.value;
-    }
-  } else if (activeTab.value != 0) {
-    activeTab.value = 0;
-    tabWrapperKey.value = !tabWrapperKey.value;
-    triggerRef(activeTab);
-  }
+        onStart() {
+          activeTab.value = index + 1;
+          showing.value = "animation";
+        },
+        onReverseComplete() {
+          activeTab.value = 0;
+          showing.value = "tabs";
+        },
+        onComplete() {
+          showing.value = "tabs";
+        },
+      },
+      `+=0.2`
+    );
+  });
 });
 
+const noJs = ref(false);
+const activeTab = ref(0);
 
+const handleTabClick = () => {
+  nextTick().then(() => {
+    timeline.scrollTrigger?.scroll(
+      (activeTab.value * 600) / (diagramData.layers.length - 1)
+    );
+  });
+};
+
+const diagramType = ref<"tabs" | "carousel">("tabs");
+const gimmeTabs = computed(() => diagramType.value === "tabs");
 </script>
 
-<!-- Add "scoped" attribute to limit CSS to this component only -->
 <style scoped>
 .animation-holder {
   height: 200px;
@@ -347,11 +254,17 @@ watch(scrollY, (val) => {
   box-shadow: 0 0 0 2px;
 }
 
+.avocado-info.animation .popover-layer,
+.avocado-info.animation .image-container > img {
+  display: none;
+}
+
 .popover-layer {
   position: absolute;
   top: 0;
   height: 100%;
   width: 100%;
+  z-index: 300;
 }
 
 .popover-activator {
@@ -394,10 +307,6 @@ watch(scrollY, (val) => {
   width: 80px;
 }
 
-.tabs__tab {
-  transition: all 0.3s linear;
-}
-
 .tabs__tab.is-active {
   color: #215c41;
 }
@@ -431,6 +340,23 @@ section header > * {
   margin-right: 12px;
 }
 
+.greensock-deck {
+  position: absolute;
+  z-index: 200;
+  pointer-events: none;
+  left: 118px;
+  top: 122px;
+}
+.avocado-info.tabs .greensock-deck {
+  opacity: 0;
+}
+
+.greensock-deck-image {
+  position: absolute;
+  border-radius: 50px/40px;
+  border: 3px solid;
+}
+
 .fade-enter-active,
 .fade-leave-active {
   transition: all 0.5s ease;
@@ -460,13 +386,13 @@ section header > * {
   position: absolute;
   left: 120px;
 }
-
+/* 
 .tab-panel.is-active {
   animation: fade-in 0.6s forwards;
 }
 .tab-panel:not(.is-active) {
   animation: fade-in 0.6s reverse;
-}
+} */
 
 @keyframes fade-in {
   0% {

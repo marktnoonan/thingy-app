@@ -14,7 +14,7 @@ import AvocadoInfo from "./components/AvocadoInfo.vue";
   text-align: center;
   color: #2c3e50;
   padding-top: 60px;
-  height: 4000px;
+  height: 1000px;
 }
 
 .sr-only {

@@ -1,0 +1,27 @@
+{
+  "title": "Extra Stuff",
+  "subtitle": "It's just cats",
+  "layers": [
+    {
+      "name": "Cats",
+      "color": "#233822",
+      "image": "cats.jpg",
+      "points": [
+        {
+          "heading": "Malta",
+          "description": "The younger cat, and also somehow the Most Trouble.",
+          "links": [],
+          "position": { "x": 60, "y": 40 },
+          "image": null
+        },
+        {
+          "heading": "Misu",
+          "description": "The older cat, and the Most Trouble.",
+          "links": [],
+          "position": { "x": 30, "y": 60 },
+          "image": null
+        }
+      ]
+    }
+  ]
+}
