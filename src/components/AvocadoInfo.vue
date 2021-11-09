@@ -165,10 +165,6 @@ onMounted(() => {
     },
   });
 
-  if (window.Cypress) {
-    window.timeline = timeline;
-  }
-
   diagramData.layers.forEach((item: never, index: number) => {
     const layerPosition = diagramData.layers.length - index - 1;
     if (index === diagramData.layers.length - 1) {
@@ -184,7 +180,7 @@ onMounted(() => {
         x: 10,
         y: -10,
         rotate: -4,
-        opacity: 0,
+        autoAlpha: 0,
         duration: 1,
         ease: "sine",
         onStart() {
@@ -207,6 +203,10 @@ onMounted(() => {
       `+=1`
     );
   });
+
+  if (window.Cypress) {
+    window.timeline = timeline;
+  }
 });
 
 const noJs = ref(false);
