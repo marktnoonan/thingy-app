@@ -13,7 +13,6 @@ export default defineConfig({
     setupNodeEvents(on, config) {
       return require("./tests/e2e/plugins/index.js")(on, config);
     },
-    specPattern: "tests/e2e/specs/**/*.{js,jsx,ts,tsx}",
     baseUrl: "http://localhost:8080",
     supportFile: "tests/e2e/support/index.js",
   },

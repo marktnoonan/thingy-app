@@ -36,7 +36,7 @@ describe("Aaaah! Vocado", () => {
     cy.window().then(async (win) => {
       win.timeline.scrollTrigger.scroll(600);
       cy.wait(0);
-      
+
       // ⛔️ weird selector that only works by coincidence of how Headless UI is implemented - we should use accessible name
       cy.get(".popover-activator").eq(3).click();
 
